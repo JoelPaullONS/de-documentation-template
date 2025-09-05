@@ -65,18 +65,8 @@ classDiagram
     classK <.. classL
     classM <|.. classN
     classO .. classP
+    classQ .. classR
 
-    class InsertSQLGenerator {
-        columns: Iterable[str]
-        partition_col: Union[str, Iterable[str]]
-        from_create_master_sql()
-        from_table()
-        get_columns_from_database()
-        generate()
-        -get_partition_col()
-        -get_columns()
-
-    }
 ```
 
 
