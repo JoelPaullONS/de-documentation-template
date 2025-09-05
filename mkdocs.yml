@@ -4,9 +4,9 @@ repo_name: JoelPaullONS/docs_workshop
 
 # commenting out this section prevents the diagrams from rendering. 
 theme:
-  name: material
+  name: mkdocs
   icon: 
-    logo: material/pipe
+    logo: mkdocs/pipe
   features:
     - navigation.instant
     - navigation.sections
