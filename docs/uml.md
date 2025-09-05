@@ -65,7 +65,6 @@ classDiagram
     classK <.. classL
     classM <|.. classN
     classO .. classP
-```
 
     class InsertSQLGenerator {
         columns: Iterable[str]
@@ -78,4 +77,7 @@ classDiagram
         -get_columns()
 
     }
+```
+
+
 
