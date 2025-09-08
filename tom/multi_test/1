@@ -1,0 +1,27 @@
+``` mermaid
+flowchart LR
+    R(Raw Data)
+    Sc["Validate Data"]
+    subgraph Lo["Load Data"]
+        direction LR
+        A1([Transformer A])
+        B1([Transformer B])
+        Stg[(Staging database)]
+        A1 --- Stg
+        B1 --- Stg
+    end
+    Pr["Promote Data"]
+    Hv[("Master Table")]
+    R --> Sc;
+    Sc --> Lo;
+    Pr --> Hv;
+    Lo --> Pr;
+    style R fill:lightyellow,stroke:#9370DB;
+    style Sc fill:#ECECFF,stroke:#9370DB;
+    style Lo fill:#ECECFF,stroke:#9370DB;
+    style A1 fill:lightblue,stroke:#9370DB;
+    style Stg fill:lightyellow,stroke:#9370DB;
+    style B1 fill:lightblue,stroke:#9370DB;
+    style Pr fill:#ECECFF,stroke:#9370DB;
+    style Hv fill:lightyellow,stroke:#9370DB;
+```
