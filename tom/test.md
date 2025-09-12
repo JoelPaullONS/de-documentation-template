@@ -26,20 +26,20 @@ direction TB
 	        - _check_for_existing_aims_results: bool = False
 	        - _pool_addresses_from_all_tables_for_aims_input: bool = False
 	        - _one_pooled_separate_output_table: bool = False
-	        - _run()
-	        - _get_ready_tables()
-	        + create_address_df()
-	        - _concat_cols()
-	        - _clean_col()
-	        - _pre_validate()
+	        - _run(spark: SparkSession, context: PipelineContext, *args: Any, **kwargs: Any) -> PipelineContext
+	        - _get_ready_tables(self, job_ids: Dict[str, List[str]]) -> Tuple[str]
+	        + create_address_df(df_data: DataFrame, id_col: str, address_cols: Iterable[str], clean_cols: bool = True) -> DataFrame:
+	        - _concat_cols(*cols: Column) -> Column
+	        - _clean_col(col: Column) -> Column
+	        - _pre_validate(self, spark: SparkSession) -> Dict[str, str]
         }
         class apply_transformers_stage {
 	        - _config_meta
 	        - _transformers: Iterable[Transformer] = None
 	        - _read_from_temp_table: bool = False
 	        - _save_as_temp_table: bool = False
-	        - _run()
-	        - _pre_validate()
+	        - _run(self, spark: SparkSession, context: PipelineContext, *args: Any, **kwargs: Any) -> PipelineContext
+	        - _pre_validate(self) -> Dict[str, list]
         }
         class config_validation_stage {
 			- _config_meta
@@ -51,24 +51,24 @@ direction TB
 			- _platform
 			- _kwargs
 			+ map_legacy_var_names
-	        -_add_errors_and_raise_config_exception()
-	        + map_legacy_var_names()
-	        -_run()
-	        + check_paths_unique()
-	        + check_database_tables_entry_for_every_table()
-	        + check_tables_to_process()
-	        + check_files_exist()
-	        + check_yaml_list_formatting()
-	        - _validate_yaml_content()
-	        - _collect_section_positions()
-	        - _check_for_duplicate_sections()
-	        - _check_for_aliased_sections()
-	        - _validate_yaml_file_by_path()
+	        -_add_errors_and_raise_config_exception(msg, context, check_name: Optional[str] = None)
+	        + map_legacy_var_names(self)
+	        -_run(self, spark: SparkSession, context: PipelineContext, *args: Any, **kwargs: Any) -> PipelineContext
+	        + check_paths_unique(config: ConfigMeta) -> Tuple[bool, List[str]]
+	        + check_database_tables_entry_for_every_table(config: ConfigMeta) -> Tuple[bool, List[str]]
+	        + check_tables_to_process(config: ConfigMeta) -> Tuple[bool, List[str]]
+	        + check_files_exist(config: ConfigMeta, platform: str) -> Tuple[bool, List[str]]
+	        + check_yaml_list_formatting(config: ConfigMeta) -> Tuple[bool, List[str]]
+	        - _validate_yaml_content(yaml_str: str, file_prefix: str = "") -> Tuple[bool, List[str], List[str]]
+	        - _collect_section_positions(lines: List[str], list_sections: List[str]) -> dict
+	        - _check_for_duplicate_sections(section_positions: dict, file_prefix: str) -> List[str]
+	        - _check_for_aliased_sections(section_positions: dict, file_prefix: str) -> List[str]
+	        - _validate_yaml_file_by_path(yaml_file_path: str, main_config_dir: str, validated_files: set = None) -> Tuple[bool, List[str]]
         }
         class create_view_stage {
 	        - _config_meta
 	        - _run()
-	        + create_view()
+	        + create_view(self, view_query: str) -> Tuple[bool, str]
         }
         class data_promotion_stage {
 			- _config_meta
@@ -83,26 +83,26 @@ direction TB
 			- _count_rows: bool = True
 			- _overwrite_using_sql_scrip: bool = False
 	        - _run()
-	        + overwrite_table()
-	        + append_table()
-	        + promote_temp_table()
-	        - _get_sql_file_path()
-	        - _pre_validate_promotion()
+	        + overwrite_table(self, table: str) -> Tuple[bool, str]
+	        + append_table(self, table: str) -> Tuple[bool, str]
+	        + promote_temp_table(self, table: str) -> Tuple[bool, str]
+	        - _get_sql_file_path(self, table: str) -> str:
+	        - _pre_validate_promotion(self) -> Dict[str, List[str]]
         }
         class find_files_to_process_stage {
 			- _config_meta
 			- _remove_staged_files: bool = True
 			- _source_file_col: str = "source_file"
 			- _platform
-	        + get_files_to_process()
-	        + get_files_from_master_table()
-	        - _check_for_yaml_lists()
-	        + process_yaml_file()
-	        + get_files_to_exclude()
+	        + get_files_to_process(self, table: str) -> List[str]
+	        + get_files_from_master_table(master_table: str, source_col: str = "source_file") -> List[str]
+	        - _check_for_yaml_lists(paths: Union[str, List[str]], table: str) -> list
+	        + process_yaml_file(file_path: str) -> list
+	        + get_files_to_exclude(conf: ConfigMeta, platform: str, table: str = "") -> List[str]
         }
         class housekeeping_stage {
 	        - _config_meta
-	        - _run()
+	        - _run(self, spark: SparkSession, context: PipelineContext, *args: Any, **kwargs: Any) -> PipelineContext
         }
         class join_data_stage {
 			+ right_location: str
@@ -112,9 +112,9 @@ direction TB
 			+ how: str = "inner"
 			+ drop_union_duplicates: bool = False
 			+ allow_missing_columns: bool = False
-	        + get_right_df()
-	        - _run()
-	        - _pre_validate()
+	        + get_right_df(self) -> DataFrame
+	        - _run(self, spark: SparkSession, context: PipelineContext, *args: Any, **kwargs: Any) -> PipelineContext
+	        - _pre_validate(self) -> Dict[str, List[str]]
         }
         class load_data_stage {
 			+ _config_meta
@@ -130,11 +130,11 @@ direction TB
 			- _count_rows: bool = True
 			- _source_file_col: str = "source_file"
 			- _guid_co: str = "guid"
-	        - _pre_validate()
-	        - _run()
-	        + read_table()
-	        - _handle_errors()
-	        + apply_transformers()
+	        - _pre_validate(self) -> Dict[str, List[str]]
+	        - _run(elf, spark: SparkSession, context: PipelineContext, *args: Any, **kwargs: Any) -> PipelineContext
+	        + read_table(self, table: str, schema: Dict[str, Dict[str, Any]], file_path: Union[str, List[str]], stg_path: str, source_file_col: Optional[str], guid_col: Optional[str]) -> FileLoader
+	        - _handle_errors(context: PipelineContext, table: str, errors_to_log: List[str], continue_on_error: bool)
+	        + apply_transformers(config: ConfigMeta, transformers: Optional[Union[List[Transformer], Set[Transformer]]], source_df: DataFrame, table: str) -> DataFrame
         }
         class schema_validation_stage {
 			- _config_meta
@@ -142,40 +142,42 @@ direction TB
 			- _allow_schema_drift: bool = False
 			- _read_options: Dict[str, Any]
 			- _header_row: int = 0
-	        - _run()
-	        + compare_schemas()
-	        + get_expected_columns()
-	        + read_header()
+	        - _run(self, spark: SparkSession, context: PipelineContext, *args: Any, **kwargs: Any) -> PipelineContext
+	        + compare_schemas(expected: Tuple[Tuple[str, ...], ...], actual: Iterable[Tuple[str, str]], allow_schema_drift: bool = False) -> Tuple[str, ...]
+	        + get_expected_columns(sm: SchemaManager) -> Tuple[Tuple[str, ...], ...]
+	        + read_header(filepath: str, read_options: Dict[str, Any], header_row: int = 0) -> List[Tuple[str, Any]
         }
 	}
 	namespace Transformers {
         class add_missing_columns_transformer {
-	        + add_missing_columns()
-	        + get_col_type()
-	        + transform()
+	        + add_missing_columns(cols: List[Tuple[str, DataType]], table_df: DataFrame) -> DataFrame
+	        + get_col_type(_column: str, _columns: List[Tuple[str, Union[str, DataType]]])
+	        + transform(self, spark: SparkSession, config: ConfigMeta, source_df: DataFrame, *args: Any, **kwargs: Any) -> DataFrame
         }
         class cast_types_transformer {
-	        - _col_types = col_types
-			- _date_format = date_format
-			- _allow_nulls = allow_nulls
+	        - _col_types
+			- _date_format
+			- _allow_nulls
 			- _source_time_zone
-			+ transform()
-	        + get_date_format()
+			+ transform(self, spark: SparkSession, config: ConfigMeta, source_df: DataFrame, *args: Any, **kwargs: Any) -> DataFrame
+	        + get_date_format(self, col_name: str) -> str
         }
         class julian_date_transformer {
-	        + transform()
-	        + convert_julian_date()
+			- 	_date_col_format_dict
+			- 	_date_cols
+			+ transform(self, spark: SparkSession, config: ConfigMeta, source_df: DataFrame, *args: Any, **kwargs: Any) -> DataFrame
+	        + convert_julian_date(df: DataFrame, date_col: str, date_format: str) -> DataFrame
         }
         class remove_spaces_transformer {
-	        + transform()
+			+ transform(self, spark: SparkSession, config: ConfigMeta, source_df: DataFrame, *args: Any, **kwargs: Any) -> DataFrame
         }
         class rename_column_transformer {
-	        + transform()
-	        + rename_column()
+			+ transform(self, spark: SparkSession, config: ConfigMeta, source_df: DataFrame, *args: Any, **kwargs: Any) -> DataFrame
+	        + rename_column(self, source_df: DataFrame, col_mapping: Dict[str, str]) -> DataFrame
         }
         class replace_value_transformer {
-	        + transform()
-	        + replace_value()
+			+ transform(self, spark: SparkSession, config: ConfigMeta, source_df: DataFrame, *args: Any, **kwargs: Any) -> DataFrame
+	        + replace_value(df: DataFrame, col_name: str, mapping_dict: Dict) -> DataFrame
         }
 	}
     class UntitledClass {
