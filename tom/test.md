@@ -180,8 +180,50 @@ direction TB
 	        + replace_value(df: DataFrame, col_name: str, mapping_dict: Dict) -> DataFrame
         }
 	}
-    class UntitledClass {
-    }
+	namespace utils {
+		class __init__ {
+			+ setup(self, platform: Optional[str] = None, auto_detect: bool = True) -> IOHandler 
+			+ get_handler() -> IOHandler
+		}
+		class _self_write_mixin{
+			+ write_table(self, df: DataFrame, dest_table: str, mode: str, self_write: bool = False, *args, **kwargs)
+		}
+		class cdp_handler{
+			+ isfile(self, spark: SparkSession, file_path: str) -> bool
+			+ list_contents(self, file_path: Union[str, List[str]], recursive: bool = False) -> Tuple[str]
+			+ get_file_size_and_count(self, file_path: str) -> Tuple[int, int]
+			+ table_exists(self, identifier: str) -> bool
+			+ drop_table(self, identifier: str, if_exists: bool = True) -> None
+			+ read_table(self, table_path: str)
+			+ run_sql_query(self, sql_query: str) -> bool
+		}
+		class gcp_handler{
+			+ isfile(self, file_path: Union[str, List[str]], recursive: bool = False) -> bool
+			+ list_contents(self, file_path: Union[str, List[str]], recursive: bool = False) -> Tuple[str]
+			+ get_file_size_and_count(self, file_path: str) -> Tuple[int, int]
+			+ table_exists(self, identifier: str) -> bool
+			+ drop_table(self, identifier: str, if_exists: bool = True) -> None
+			+ write_table(self, df: DataFrame, dest_table: str, mode: str, count_rows: bool = True, *args, **kwargs) -> None
+			+ read_table(self, table_path: str)
+			+ run_sql_query(self, sql_query: str) -> bool
+		}
+		class io_handler{
+			+ isfile(self, file_path: str) -> bool
+			+ list_contents(self, file_path: Union[str, List[str]], recursive: bool = False) -> Tuple[str]
+			+ table_exists(self, identifier: str) -> bool
+			+ drop_table(self, identifier: str, if_exists: bool = True) -> None
+			+ write_table(self, df: DataFrame, dest_table: str, mode: str, count_rows: bool = True, *args, **kwargs) -> None
+			+ read_table(self, table_path: str)
+			+ run_sql_query(self, sql_query: str) -> bool
+		}
+
+	}
+
+	namespace handlers {
+		class a {
+
+		}
+	}
 
 
 ```
