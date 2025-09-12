@@ -90,10 +90,10 @@ direction TB
 	        - _pre_validate_promotion()
         }
         class find_files_to_process_stage {
-	        - _config_meta
-	        - bool: _remove_staged_files = True
-	        - str: _source_file_col = "source_file"
-	        - _platform
+			- _config_meta
+			- _remove_staged_files: bool = True
+			- _source_file_col: str = "source_file"
+			- _platform
 	        + get_files_to_process()
 	        + get_files_from_master_table()
 	        - _check_for_yaml_lists()
