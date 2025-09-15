@@ -219,10 +219,110 @@ direction TB
 
 	}
 
-	namespace handlers {
-		class a {
+	namespace utils handlers {
+		class config_meta {
+			- 	_version
+			+ 	project_path
+			- 	_allow_dynamic_keys
+			- 	_mock
+			- 	__init__(self, section: Dict[str, Any])
+			- 	__repr__(self) -> str
+			- 	__getattr__(self, key: str) -> Any
+			+ 	as_dict(self) -> Dict[str, Any]
+			- 	__init__(self, project_path: str = "", config_file: str = "config.yml", config_path: str = "config", version: str = "V1", allow_dynamic_keys: bool = False, mock: bool = False)
+			- 	__getattr__(self, key: str) -> None
+			+ 	mock_config(cls) -> "ConfigMeta"
+			+ 	tables_to_process(self) -> List[str]
+			+ 	database_tables_config(self) -> Dict[str, Any]
+			+ 	hive_config(self) -> Dict[str, Any]
+			+ 	log_config(self)
+			+ 	log_dir_path(self)
+			+ 	files_config(self)
+			+ 	hdfs_config(self)
+			+ 	files_to_exclude_config(self) -> dict
+			+ 	hdfs_exclude_config(self) -> dict
+			+ 	schema_path(self) -> str
+			+ 	sql_files_path(self)
+			+ 	get_file_path(self, table: str) -> Union[str, List[str]]
+			+ 	get_hdfs_path(self, table: str) -> Union[str, List[str]]
+			+ 	get_database_tables_config_for_key(self, table: str) -> str
+			+ 	table_prefix(self) -> str
+			+ 	get_full_stg_path(self, table: str) -> str
+			+ 	dataset_name(self) -> str
+			+ 	promote_flag(self) -> bool
+			+ 	view_flag(self) -> bool
+			+ 	view_path(self)
+			+ 	views_to_process(self) -> List[str]
+			+ 	view_config(self) -> Dict[str, Any]
+			+ 	housekeeping_enabled(self) -> bool
+			+ 	aims_config(self)
+		}
+		class decorators {
+			+ 	gcp_only(func: Callable) -> Any
+			+ 	cdp_only(func: Callable) -> Any
 
 		}
+
+		class helpers {
+			+ 	write_error_counts(loader: FileLoader, table: str, config_meta: ConfigMeta)
+			+ 	execute_sql_with_params(sql: str = None, sql_filepath: str = None, template_params: dict = None, platform: str = "cdp") -> bool
+			+ 	trim_path(file_list: list) -> list
+			+ 	calculate_null_counts(df: DataFrame, cols: Sequence[str]) -> Dict[str, int]
+			+ 	get_table_arg(table: str, arg: StageArg[Arg]) -> Arg
+			+ 	get_cdp_environment()
+			+ 	get_s3_scheme() -> str
+			+ 	build_schema(cols: Iterable[str], sm: SchemaManager) -> Dict[str, Dict[str, Any]]
+			- 	_get_col_from_alias(name_or_alias: str, sm: SchemaManager) -> str
+			+ 	get_sm(config_meta: ConfigMeta, table: str)
+		}
+
+		class insert_sql_generator {
+			- 	_columns
+			- 	_partition_col
+			- 	__init__(self, columns: Iterable[str], partition_col: Union[str, Iterable[str]])
+			+ 	from_create_master_sql(cls, create_master_sql: str, _master_tables_are_partitioned: bool) -> "InsertSQLGenerator"
+			+ 	from_table(cls, target_table: str) -> "InsertSQLGenerator"
+			+ 	get_columns_from_database(target_table: str) -> Tuple[Tuple[str], Tuple[str]]
+			+ 	generate(self, _master_tables_are_partitioned: bool, source_db: str = "dap_daas_engineering", source_table: str = None, target_db: str = None, target_table: str = None) -> str
+			- 	_get_partition_col(create_master_sql: str) -> Union[str, List[str]]
+			- 	_get_columns(create_master_sql: str) -> List[str]
+		}
+
+		class logger {
+			- 	_is_set_up = False
+			- 	_logger = None
+			+ 	service_name = "NOT SET"
+			+ 	log_level = logging.INFO
+			- 	_print_to_stdout = False
+			+ 	filename = None
+			- 	_error_output = []
+			- 	_warning_output = []
+		}
+
+		class schemas_to_process {
+			+ 	add_schema(schemas: List[TableSchema], schema: Schema, file: str) -> List[TableSchema]
+			+ 	to_dict(schemas: List[TableSchema]) -> Dict[Schema, List[str]]
+			- 	_find_schema(schemas: List[TableSchema], schema: Schema) -> Optional[TableSchema]
+		}
+
+		class table_tracker {
+			- 	__init__(self, config_meta: ConfigMeta)
+			+ 	insert_table(self, table_name: str, loader: TableLoader, count_rows: bool = True, files: list = [])
+			+ 	to_dict(self) -> Dict[str, Any]
+			- 	_generate_report(self)
+			+ 	log_report(self, print_too=True)
+			- 	_humanise_size(byte_count: int) -> str
+			+ 	get_size_and_count(file_paths: Union[str, List[str]]) -> Tuple[str, int]
+		}
+
+		class template_config_meta {
+			- 	__init__(self, project_path: str = "", config_file: str = "config.yml", config_path: str = "config", version: str = "V1", allow_dynamic_keys: bool = False,  mock: bool = False, template_values: str = "template_values.yml", template_setting: str = "")
+		}
+
+		class typeguard_helpers {
+			+ 	typechecked_with_logging(cls_or_func: Union[Type[T], F]) -> Union[Type[T], F]
+		}
+
 	}
 
 
