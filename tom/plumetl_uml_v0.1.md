@@ -1,8 +1,35 @@
-# Heading
+# Plumb-ETL UML Diagram
 
-- one
-- two
-- three
+Work in progress
+Note work to date was completed as an exercise for a actively learning apprentice, details should be checked before signed off.
+
+### Goal
+
+Document Plum-ETL objects visually, using mermaid charts (which are compatible with markdown and github readme pages).
+
+### References
+
+- https://github.com/ONSdigital/plumb-etl/tree/develop/plumb_etl
+- https://www.mermaidchart.com/play
+- https://www.geeksforgeeks.org/system-design/unified-modeling-language-uml-class-diagrams/
+- https://docs.github.com/en/get-started/writing-on-github/working-with-advanced-formatting/creating-diagrams#creating-mermaid-diagrams
+- https://mkdocs-mermaid2.readthedocs.io/en/master/tips/
+
+### Areas of Plumb-ETL Covered in These Diagrams
+
+- Stages
+- Transformers
+- utils
+- utils / handlers
+
+### Progress
+
+- [Complete] Classes from 4 repositories named above have been documented in the below diagram, grouped as per that structure
+- [Complete] Attributes and Operations / Methods documented
+- [Complete] Attribute types documented
+- [Complete] Method argument and type hints added
+- [Not Started] Relationships between Objects
+
 
 ```mermaid
 classDiagram
